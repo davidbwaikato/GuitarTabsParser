@@ -46,6 +46,7 @@ var HttpClient = function() {
 	let client = new HttpClient();
     client.get( "http://localhost:8080/parse?artist=" + encodeURIComponent( args.artist ) + "&song_identifier=" + encodeURIComponent( args.song_identifier ), function( res ) {
     	loader.classList.remove( "show" );
-    	body.innerText = res;
+    	//body.innerText = res;
+	body.innerHTML = "<code>" + res + "</code>";
     } );
 } )( window.location.href );

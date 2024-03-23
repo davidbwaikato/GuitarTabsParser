@@ -1,20 +1,29 @@
 const request = require('request')
 const utils = require('./utils')
 
+// Looks like the following might come from:
+//   https://github.com/jers0/ultimate-guitar-scraper
+
 function search ( query, callback, requestOptions ) {
-  requestOptions = requestOptions || {}
-  query = utils.formatSearchQuery(query)
-  requestOptions.url = 'http://www.ultimate-guitar.com/search.php?' + utils.encodeParams(query)
-  request(requestOptions, (error, response, body) => {
-    if (error) {
-      callback(error, null, response, body)
-    } else if (response.statusCode !== 200) {
-      callback(new Error('Bad response'), null, response, body)
-    } else {
-      const tabs = utils.parseListTABs(body)
-      callback(null, tabs, response, body)
-    }
-  })
+    requestOptions = requestOptions || {}
+    query = utils.formatSearchQuery(query)
+    requestOptions.url = 'http://www.ultimate-guitar.com/search.php?' + utils.encodeParams(query)
+    
+    request(requestOptions, (error, response, body) => {
+	if (error) {
+	    callback(error, null, response, body)
+	} else if (response.statusCode !== 200) {
+	    callback(new Error('Bad response'), null, response, body)
+	} else {
+	    // const tabs = utils.parseListTABsDeprecated(body)
+	    (async () => {
+		const tabs = await utils.parseListTABsURL(requestOptions.url);
+		callback(null, tabs, response, body)	    
+	    })()
+	}
+    });
+
+    
 }
 
 function autocomplete (query, callback, requestOptions) {
@@ -51,12 +60,16 @@ function get (tabUrl, callback, requestOptions) {
     } else if (response.statusCode !== 200) {
       callback(new Error('Bad response'), null, response, body)
     } else {
-      const tab = utils.parseSingleTAB(body, tabUrl)
-      if (tab) {
-        callback(null, tab, response, body)
-      } else {
-        callback(new Error("Can't parse TAB"), null, response, body)
-      }
+	//const tab = utils.parseSingleTABDeprecated(body, tabUrl)
+	(async () => {
+	    const tab = await utils.parseListTABURL(tabUrl);
+	
+	    if (tab) {
+		callback(null, tab, response, body)
+	    } else {
+		callback(new Error("Can't parse TAB"), null, response, body)
+	    }
+	});
     }
   })
 }

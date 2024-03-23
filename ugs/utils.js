@@ -1,9 +1,11 @@
 const cheerio = require('cheerio')
-const JSON5 = require('json5')
+const JSON5   = require('json5')
+
+const puppeteer= require('puppeteer');
 
 const debug = true
 
-function extractJavaScriptAssignation ($, assignTo) {
+function extractJavaScriptAssignationDeprecated ($, assignTo) {
   let script = $('script').toArray().find((script) => {
     return $(script).html().indexOf(assignTo) !== -1
   })
@@ -19,6 +21,51 @@ function extractJavaScriptAssignation ($, assignTo) {
     console.error(error)
   }
 }
+
+async function extractJavaScriptAssignationAsData (url, assignTo) {
+
+    // Based on:
+    //   https://pptr.dev/guides/evaluate-javascript
+    
+    // Launch the browser
+    const browser = await puppeteer.launch();
+
+    // If looking to pass in config params:
+    //  const browser = await puppeteer.launch({
+    //      headless: true,
+    //      args: ['--no-sandbox']
+    //  });
+
+    // Create a page
+    const page = await browser.newPage();
+
+    // Go to your site
+    await page.goto(url);
+
+    // The following is the usual way you would return a JavaScript variable
+    // from the browser context through page.evaluate()
+    //
+    //   const assignToObject = await page.evaluate(() => {
+    //     return window.UGAPP.store.page
+    //   });
+    
+    // However, to do this in a parameterised way, using whatever 'assignTo' 
+    // is set to, we need to work a bit harder 
+
+    // Evaluate JavaScript
+    eval_function = function(at) {
+	return at
+    }(assignTo)
+    
+    const assignToObject = await page.evaluate(eval_function);
+        
+    // Close browser
+    await browser.close();
+
+    return assignToObject;    
+}
+
+
 
 const tabTypes = {
   'Video': 'Video',
@@ -104,9 +151,9 @@ function extractContent (data) {
 /**
 * Return TABs from the response body.
 */
-function parseListTABs (body) {
-  const $ = cheerio.load(body)
-  const data = extractJavaScriptAssignation($, 'window.UGAPP.store.page')
+
+function parseListTABsData (data) {
+    
   if (!data) return []
   let results = []
   if (typeof data.data.other_tabs !== 'undefined') {
@@ -135,9 +182,22 @@ function parseListTABs (body) {
   }, [])
 }
 
-function parseSingleTAB (html, tabUrl) {
-  const $ = cheerio.load(html)
-  const data = extractJavaScriptAssignation($, 'window.UGAPP.store.page')
+function parseListTABsDeprecated (body) {
+  const $ = cheerio.load(body)
+  const data = extractJavaScriptAssignationDeprecated($, 'window.UGAPP.store.page')
+
+  return parseListTABsData(data)
+}
+
+
+async function parseListTABsURL (url) {    
+    const data = await extractJavaScriptAssignationAsData(url,'window.UGAPP.store.page');
+    
+    return parseListTABsData(data);
+}
+
+
+function parseSingleTABData (data) {
   if (!data) return
   const tab = {}
   // Artist.
@@ -161,6 +221,19 @@ function parseSingleTAB (html, tabUrl) {
   return tab
 }
 
+
+function parseSingleTABDeprecated (html, tabUrlUnused) {
+    const $ = cheerio.load(html)
+    const data = extractJavaScriptAssignation($, 'window.UGAPP.store.page')
+
+    return parseSingleTABData(data);
+}
+
+function parseSingleTABURL (url) {
+    const data = extractJavaScriptAssignationAsData(url, 'window.UGAPP.store.page')
+
+    return parseSingleTABData(data);
+}
 /**
 * Validate the query params and set the default params for the 'search'
 *
@@ -239,7 +312,7 @@ function encodeParams (params) {
 
 module.exports = {
   encodeParams,
-  parseListTABs,
-  parseSingleTAB,
+  parseListTABsURL,
+  parseSingleTABURL,
   formatSearchQuery
 }
