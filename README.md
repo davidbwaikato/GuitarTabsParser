@@ -7,11 +7,11 @@
 
 ### Usage:
 - Clone or [Download](https://github.com/davidbwaikato/GuitarTabsParser/archive/master.zip) the source.
-- The relevent file to require is "[scraper.js](blob/master/scraper.js)".
-- [scraper.js](blob/master/scraper.js) contains the async method "getSong(...)" which takes a link to a UG song as a parameter, and calls the callback with a JSON object with the format mentioned below.
+- The relevent file to require is "[scraper.js](scraper.js)".
+- [scraper.js](scraper.js) contains the async method "getSong(...)" which takes a link to a UG song as a parameter, and calls the callback with a JSON object with the format mentioned below.
 
 ### Demo:
-- The file [web-server.js](blob/master/web-server.js) contains a demo server that can be interacted with via the [index.html](blob/master/index.html) HTML file.
+- The file [web-server.js](web-server.js) contains a demo server that can be interacted with via the [index.html](index.html) HTML file.
 - The demo shows off the auto-complete, and query search by displaying all songs related to your search string. You can also parse the given song on the fly by clicking on it.
 - To install the name enter:
     npm install
