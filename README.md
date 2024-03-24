@@ -6,14 +6,20 @@
 - The tablature gets parsed into sections, which in turn are sliced by measures, which encapsulate every given time step.
 
 ### Usage:
-- Clone or [Download](https://github.com/McCrearyD/GuitarTabsParser/archive/master.zip) the source.
-- The relevent file to require is "[scraper.js](https://github.com/davidbwaikato/GuitarTabsParser/blob/master/scraper.js)".
-- [scraper.js](https://github.com/McCrearyD/GuitarTabsParser/blob/master/scraper.js) contains the async method "getSong(...)" which takes a link to a UG song as a parameter, and calls the callback with a JSON object with the format mentioned below.
+- Clone or [Download](https://github.com/davidbwaikato/GuitarTabsParser/archive/master.zip) the source.
+- The relevent file to require is "[scraper.js](blob/master/scraper.js)".
+- [scraper.js](blob/master/scraper.js) contains the async method "getSong(...)" which takes a link to a UG song as a parameter, and calls the callback with a JSON object with the format mentioned below.
 
 ### Demo:
-- The file [main.js](https://github.com/davidbwaikato/GuitarTabsParser/blob/master/main.js) contains a demo server that can be interacted with via the [index.html](https://github.com/davidbwaikato/GuitarTabsParser/blob/master/index.html) HTML file.
+- The file [web-server.js](blob/master/web-server.js) contains a demo server that can be interacted with via the [index.html](blob/master/index.html) HTML file.
 - The demo shows off the auto-complete, and query search by displaying all songs related to your search string. You can also parse the given song on the fly by clicking on it.
-
+- To install the name enter:
+    npm install
+- To run the demo enter:
+    node ./web-server.js
+Then visit in your web browser the URL:
+    http://localhost:8080/index.html
+    
 ### Auto-Complete
 
 <p align="center">
